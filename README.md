@@ -14,5 +14,12 @@ personal project for idea I've had for foster youth since I was younger
 ## Modules 
 1. Secure Login 
 2. Database
-3. Cloud (later implementation)
-4. WEB App (initial start, move to mobile eventually)
+3. Document Drive - upload & access files 
+4. Cloud (later implementation)
+5. WEB App (initial start, move to mobile eventually)
+6. Connect w/ People (stretch goal - means to connect w/ other FY)
+
+
+## Database Schema
+This schema reflects the relationship of how the user can access their drive with all their personal documents.   
+![This is my database schema](fy-database.png)
