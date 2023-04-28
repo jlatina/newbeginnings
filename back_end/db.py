@@ -1,6 +1,7 @@
 # Copyright 2023 Jeanette Villanueva 
 import mysql.connector
 from mysql.connector import Error  
+from flask import Flask, request
 # https://pynative.com/python-mysql-database-connection/#h-how-to-connect-mysql-database-in-python
 
 
@@ -33,7 +34,36 @@ def db_connect():
             cursor.close()
             connection.close()
 
-    return status_code         
+    return (status_code,connection)         
+
+# Connect to the MySQL database
+db = db_connect()
+
+# create a Flask app 
+app = Flask(__name__)
+
+
+
+""" method to upload any file from their drive to the database """
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    status = "failed"
+    file = request.files['file']
+
+    return status 
+
+
+
+
+"""method to access a particular file from their drive"""
+@app.route('/upload', methods=['GET'])
+def access_file():
+    status = "file does not exist"
+    file = request.files['file']
+
+    my_cursor = db.cursor(buffered= True) 
+    return status
+
 
 
 def main():
@@ -41,3 +71,4 @@ def main():
     print(result)
 if __name__=="__main__":
     main()
+    app.run(debug=True)
