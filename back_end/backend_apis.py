@@ -1,7 +1,7 @@
 # Copyright 2023 Jeanette Villanueva 
 import mysql.connector
 from mysql.connector.errors import Error  
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from db import db_connect
 #import uuid 
 import random 
@@ -18,6 +18,7 @@ table = "doc_info" # hardcoded for now
 username = "jivillan" # hardcoded for now 
 
 """ method to upload any file from their drive to the database """
+## need to edit the code so that it gets one of the files retrieved from postman, so it uploads all of them , not just one at a time.
 @app.route('/upload', methods=['POST'])
 def upload_file():
     file = request.files['file']
@@ -29,7 +30,7 @@ def upload_file():
     db = mysql.connector.connect(user='root', host='localhost', database='fy_app_db')
     cursor = db.cursor(buffered=True) 
     
-    if status == "success" and file is not None:
+    if (status == "success" and file is not None):
         # randomly generate ID for doc_id
         random_int = random.randint(1, 1000)
 
@@ -38,7 +39,7 @@ def upload_file():
             sql_query = "INSERT INTO fy_app_db.doc_info(folder_name, doc_id, doc_name, doc_type) VALUES(%s, %s, %s, %s)"
             data = (folder_name, random_int, filename, filetype)
         elif table == "doc_drive":
-            sql_query = "INSERT INTO fy_app_db.doc_drive(username, foldername, date_uploaded) VALUES(%s, %s, %s)"
+            sql_query = "INSERT INTO fy_app_db.doc_drive(username, folder_name, date_uploaded) VALUES(%s, %s, %s)"
             data = (username, folder_name, datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
         
         try:
@@ -68,16 +69,62 @@ def upload_file():
 
 
 """method to access a particular file from their drive"""
-# @app.route('/access', methods=['GET'])
-# def access_file():
-#     file = request.files['file']
+@app.route('/access', methods=['GET'])
+def access_file():
+   
+   #retrieve folder & file name specifed from postman params 
+   folder = request.args.get('folder')
+   filename = request.args.get('file')
 
-#     my_cursor = db.cursor(buffered= True) 
-#     return status
 
-# def main():
-#     result = upload_file()
-#     print(f"result = {result}")
+   # MySQL database connection
+   status = db_connect()  
+   db = mysql.connector.connect(user='root', host='localhost', database='fy_app_db')
+   
+   # create seperate cursors for the differnt tables
+   drive_cursor = db.cursor(buffered=True)
+   file_cursor = db.cursor(buffered=True)
+
+   if (status == "success" and filename is not None and folder is not None):
+    
+    # two different queries based on folder & file name
+    folder_query = f"SELECT * FROM fy_app_db.doc_drive WHERE folder_name='{folder}'"
+    file_query = f"SELECT * FROM fy_app_db.doc_info WHERE folder_name='{folder}'AND doc_name='{filename}'"
+   
+    try:
+        # Check if the connection is still alive before adding to table
+        if not db.is_connected():
+            db.reconnect(attempts=3, delay=0)
+        else:
+            # execute queries 
+            drive_cursor.execute(folder_query)
+            folder_status = drive_cursor.fetchall() 
+            file_cursor.execute(file_query) 
+            file_status = file_cursor.fetchall()
+            status = "success" 
+            overall_status = folder_status + file_status
+
+        if overall_status is not None:
+                # print the info contained in the rows doc_info since
+                for row in file_status: 
+                    print(f"row = {row} from doc_info table")
+
+        if db.is_connected():
+                if (file_cursor is not None and drive_cursor is not None):
+                    drive_cursor.close()
+                    file_cursor.close()
+                db.close()
+                print("MySQL connection is closed") 
+    except Error as e:
+        print(f"Error will adding to table ={table}", e) 
+        status = "failure"   
+
+   return status
+
+def main():
+    #result = upload_file()
+    result = access_file()
+    print(f"result = {result}")
 if __name__=="__main__":
   # main()
    app.run()
