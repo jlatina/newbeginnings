@@ -29,8 +29,8 @@ def db_connect():
         if connection is not None and connection.is_connected():
             cursor.close()
             connection.close()
-
-    return (status_code,connection) 
+   # print(f"db_connect() returning status_code={status_code} and connection={connection}")
+    return status_code
 
 def main():
     result = db_connect()
