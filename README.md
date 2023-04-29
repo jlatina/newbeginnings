@@ -31,3 +31,6 @@ Proof that one of my apis (upload_file) works!
 
 **Example of success in adding into specified table ! **
 ![success](db_success.png)
+
+**Example of success in retrieivng a file from specifed foldername and file ! **
+![success](access_file_success.png)
