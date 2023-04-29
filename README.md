@@ -26,4 +26,4 @@ This schema reflects the relationship of how the user can access their drive wit
 
 ## Postman - Testing Apis 
 
-![Proof that one of my apis works](Postman succcess.png)
+![Proof that one of my apis works](Postman.png)
