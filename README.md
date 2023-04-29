@@ -23,3 +23,7 @@ personal project for idea I've had for foster youth since I was younger
 ## Database Schema
 This schema reflects the relationship of how the user can access their drive with all their personal documents.   
 ![This is my database schema](fy-database.png)
+
+## Postman - Testing Apis 
+
+![Proof that one of my apis works](Postman succcess.png)
