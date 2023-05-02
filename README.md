@@ -28,7 +28,7 @@ This schema reflects the relationship of how the user can access their drive wit
 ## Running Project 
 - clone repository 
 - run in vscode by **right clicking in file + Run Python File in terminal**
-    - copy url from: ` Running on http://127.0.0.1:5000`
+    - copy url from terminal : ` Running on http://127.0.0.1:5000`
     - paste url into **Postman GET/POST request + endpoint**: `http://127.0.0.1:5000/upload`
     
 
