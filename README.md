@@ -1,7 +1,3 @@
-# newbeginnings
-personal project for idea I've had for foster youth since I was younger
-
-
 ## Project Goals
  1. I should securely login into the app to access my files 
  2. I should be able to access my files caretakers/social workers uploaded 
@@ -15,9 +11,10 @@ personal project for idea I've had for foster youth since I was younger
 1. Secure Login 
 2. Database
 3. Document Drive - upload & access files 
-4. Cloud (later implementation)
-5. WEB App (initial start, move to mobile eventually)
-6. Connect w/ People (stretch goal - means to connect w/ other FY)
+4. NLP
+5. Cloud (later implementation)
+6. WEB App (initial start, move to mobile eventually)
+7. Connect w/ People (stretch goal - means to connect w/ other FY)
 
 
 ## Database Schema
@@ -26,20 +23,25 @@ This schema reflects the relationship of how the user can access their drive wit
 
 
 ## Running Project 
-- clone repository 
-- run in vscode by **right clicking in file + Run Python File in terminal**
+- download mysql from homebrew `brew install mysql`
+    - download MySQL Workbench for desktop: [MySQL Workbench](https://dev.mysql.com/downloads/workbench/)
+- download Postman for desktop: [Postman](https://www.postman.com/downloads/)
+- clone repository: `<> Code --> copy HTTPS url` 
+- run in Visual Studio Code by **right clicking in file + Run Python File in terminal**
     - copy url from terminal : ` Running on http://127.0.0.1:5000`
     - paste url into **Postman GET/POST request + endpoint**: `http://127.0.0.1:5000/upload`
-    
-
 
 ## Postman - Testing Apis 
 
 Proof that one of my apis (upload_file) works!
 ![Proof that one of my apis works](Postman.png)
 
-**Example of success in adding into specified table ! **
+**Example of success in adding into specified table !**
 ![success](db_success.png)
 
-**Example of success in retrieivng a file from specifed foldername and file ! **
+**Example of success in retrieivng a file from specifed foldername and file !**
 ![success](access_file_success.png)
+
+
+**Example of success in adding users into the database !**
+![success](login_success.png)
