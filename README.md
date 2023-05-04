@@ -30,6 +30,7 @@ This schema reflects the relationship of how the user can access their drive wit
 - run in Visual Studio Code by **right clicking in file + Run Python File in terminal**
     - copy url from terminal : ` Running on http://127.0.0.1:5000`
     - paste url into **Postman GET/POST request + endpoint**: `http://127.0.0.1:5000/upload`
+- aside : if you want to debug the python file, either 'backend_api.py' or 'login.py' make sure you create a 'launch.json' file then run the debugger 
 
 ## Postman - Testing Apis 
 
