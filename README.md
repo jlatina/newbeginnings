@@ -1,12 +1,17 @@
-## Project Goals
+## Project Goal 
+This app's target audience are foster youth that have aged out of the system when they are 18 years old & even foster youth who have been happily adopted. They will be able to use this app to access any and all documentation from legal files to mementos like photos. This app serves as one's personal flashback that can be accessed at their finger tips whenever they desire. Lastly, this app serves to maintain the positive memories of the foster youth's life and intends to be living proof that despite the traumatic experiences endured, their identity hasn't been completely erased. 
+
+## Project Motivation
+I am eager to complete this project as I have a personal connection/motivation to this project. As a proud adoptee and former youth, I yearned as I grew older to have mementos and access to documentation that reflected the person I was and how I looked when I was younger. Yet, I had little to no evidence of who I was, who I met, and where I had been. The common phrase "take a picture, it lasts longer" is something I've held dear to my heart & I want current foster youth to feel secure in knowing they will not completely lose parts of their identify due to their involuntary placement in the Foster system.  
+
+
+## Project User Stories 
  1. I should securely login into the app to access my files 
  2. I should be able to access my files caretakers/social workers uploaded 
  3. I should be able to upload any files (PDFs, images)
  4. I want to know all the names, locaitons, instituions and address in my documents. 
-
-## Project Motivation
-
-
+ 
+ 
 ## Modules 
 1. Secure Login 
 2. Database
