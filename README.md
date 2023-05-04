@@ -33,15 +33,15 @@ This schema reflects the relationship of how the user can access their drive wit
 
 ## Postman - Testing Apis 
 
-Proof that one of my apis (upload_file) works!
+Proof that upload_file() api works!
 ![Proof that one of my apis works](Postman.png)
 
 **Example of success in adding into specified table !**
 ![success](db_success.png)
 
-**Example of success in retrieivng a file from specifed foldername and file !**
+**Example of success in retrieivng a file from specifed foldername and file - access_file() api works!**
 ![success](access_file_success.png)
 
 
-**Example of success in adding users into the database !**
+**Example of success in adding users into the database - login() api works !**
 ![success](login_success.png)
