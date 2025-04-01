@@ -13,113 +13,134 @@ import datetime
 app = Flask(__name__)   
 
 # HARDCODED DATA 
-folder_names = ["Pictures", "Important Info", "Education", "Miscellaneous"]
+folder_names = ["Pictures", "Important Info", "Education", "Poems"]
 table = "doc_info" # hardcoded for now 
 username = "jivillan" # hardcoded for now 
+
+schema_1 = "doc_drive_schema"
+schema_2 = "doc_info_schema"
+schema_3 = "user_schema"
 
 """ method to upload any file from their drive to the database """
 ## need to edit the code so that it gets one of the files retrieved from postman, so it uploads all of them , not just one at a time.
 @app.route('/upload', methods=['POST'])
 def upload_file():
+
+    # Check if there's a file provided or not 
+    if 'file' not in request.files:
+        return jsonify({"status": "failure", "message": "No file provided"}), 400
+    
+
     file = request.files['file']
-    filename, filetype = file.filename.split(".", 1)
+    filename, filetype = file.filename.rsplit(".", 1)
     folder_name = folder_names[3] # hardcoded for now 
     
-    # MySQL database connection
-    status = db_connect()  
-    db = mysql.connector.connect(user='root', host='localhost', database='fy_app_db')
-    cursor = db.cursor(buffered=True) 
+    # status = db_connect()  
+
+    try:
+         # MySQL database connection
+        db = mysql.connector.connect(user='root', host='localhost')
+        cursor = db.cursor(buffered=True) 
+
+        # Ensure the connection is alive
+        if not db.is_connected():
+            db.reconnect(attempts=3, delay=0)
+
+    # if (status == "success" and file is not None):
     
-    if (status == "success" and file is not None):
-        # randomly generate ID for doc_id
-        random_int = random.randint(1, 1000)
-
-        print(f'table = {table}')
         if table == "doc_info":
-            sql_query = "INSERT INTO fy_app_db.doc_info(folder_name, doc_id, doc_name, doc_type) VALUES(%s, %s, %s, %s)"
-            data = (folder_name, random_int, filename, filetype)
+            sql_query = f"""
+            INSERT INTO {schema_2}.doc_info (folder_name, doc_name, doc_type) 
+            VALUES (%s, %s, %s)"""
+            data = (folder_name, filename, filetype) # doc_id is auto-increment
         elif table == "doc_drive":
-            sql_query = "INSERT INTO fy_app_db.doc_drive(username, folder_name, date_uploaded) VALUES(%s, %s, %s)"
+            sql_query = f"""
+            INSERT INTO {schema_1}.doc_drive (username, folder_name, date_uploaded) 
+            VALUES (%s, %s, %s)"""
             data = (username, folder_name, datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-        
-        try:
-            # Check if the connection is still alive before adding to table
-            if not db.is_connected():
-                db.reconnect(attempts=3, delay=0)
-            else:
-                # Execute and commit the inserts into the respective table
-                cursor.execute(sql_query, data)
-                db.commit() 
-                print(f"Data successfully added to table={table}")
-                status = "success"
 
-            # If still connected to the database after adding, close it
-            if db.is_connected():
-                if cursor is not None:
-                    cursor.close()
-                db.close()
-                print("MySQL connection is closed") 
+        cursor.execute(sql_query, data)
+        db.commit() 
 
-        except Error as e:
-            print(f"Error will adding to table ={table}", e) 
-            status = "failure"
-                   
-    return status
+        # ✅ Check if rows were affected (i.e., the insert was successful)
+        if cursor.rowcount > 0:
+            return jsonify({
+                "status": "success", 
+                "message": f"File uploaded successfully into {table} table"
+                })
+        else:
+            return jsonify({
+                "status": "failure", 
+                "message": "No rows affected, file may not have been inserted"
+                }), 500
 
-
+    except Error as e:
+        return jsonify({"status": "failure", "error": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 """method to access a particular file from their drive"""
 @app.route('/access', methods=['GET'])
 def access_file():
-   
-   #retrieve folder & file name specifed from postman params 
-   folder = request.args.get('folder')
-   filename = request.args.get('file')
-
-
-   # MySQL database connection
-   status = db_connect()  
-   db = mysql.connector.connect(user='root', host='localhost', database='fy_app_db')
-   
-   # create seperate cursors for the differnt tables
-   drive_cursor = db.cursor(buffered=True)
-   file_cursor = db.cursor(buffered=True)
-
-   if (status == "success" and filename is not None and folder is not None):
+    # Retrieve folder & file name specified from Postman params
+    folder = request.args.get('folder')
+    filename = request.args.get('file')
     
-    # two different queries based on folder & file name
-    folder_query = f"SELECT * FROM fy_app_db.doc_drive WHERE folder_name='{folder}'"
-    file_query = f"SELECT * FROM fy_app_db.doc_info WHERE folder_name='{folder}'AND doc_name='{filename}'"
-   
+    # Check if there's a folder or file provided
+    if not folder or not filename:
+        return jsonify({
+            "status": "failure",
+              "message": "Missing folder or file parameter"
+              }), 400
+    
     try:
-        # Check if the connection is still alive before adding to table
+        # MySQL database connection
+        db = mysql.connector.connect(user='root', host='localhost')
+        cursor = db.cursor(dictionary=True)  # Use dictionary=True for JSON serialization
+
+        # Ensure the connection is alive
         if not db.is_connected():
             db.reconnect(attempts=3, delay=0)
+
+        # Two different queries based on folder & file name
+        folder_query = f"SELECT * FROM {schema_1}.doc_drive WHERE folder_name=%s"
+        file_query = f"SELECT * FROM {schema_2}.doc_info WHERE folder_name=%s AND doc_name=%s"
+        
+        # Execute queries for both tables
+        cursor.execute(folder_query, (folder,))
+        folder_status = cursor.fetchall()
+        
+        cursor.execute(file_query, (folder, filename))
+        file_status = cursor.fetchall()
+        
+        # Separate responses for each query
+        if folder_status:
+            folder_response = {"status": "success", "data": folder_status}
         else:
-            # execute queries 
-            drive_cursor.execute(folder_query)
-            folder_status = drive_cursor.fetchall() 
-            file_cursor.execute(file_query) 
-            file_status = file_cursor.fetchall()
-            status = "success" 
-            overall_status = folder_status + file_status
+            folder_response = {"status": "failure", "message": "Folder not found in doc_drive"}
 
-        if overall_status is not None:
-                # print the info contained in the rows doc_info since
-                for row in file_status: 
-                    print(f"row = {row} from doc_info table")
+        if file_status:
+            file_response = {"status": "success", "data": file_status}
+        else:
+            file_response = {"status": "failure", "message": "File not found in doc_info"}
 
-        if db.is_connected():
-                if (file_cursor is not None and drive_cursor is not None):
-                    drive_cursor.close()
-                    file_cursor.close()
-                db.close()
-                print("MySQL connection is closed") 
+        # Return both responses
+        return jsonify({
+            "folder_status": folder_response,
+            "file_status": file_response
+        }), 200
+
     except Error as e:
-        print(f"Error will adding to table ={table}", e) 
-        status = "failure"   
-
-   return status
+        return jsonify({"status": "failure", "error": str(e)}), 500
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 def main():
     #result = upload_file()
